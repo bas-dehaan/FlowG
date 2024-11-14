@@ -98,23 +98,22 @@ func TestGlimsOutput(t *testing.T) {
 
 	config = &configStruct{
 		glimsDir:     "./glims",
+		importDir:    "./import",
 		processedDir: "./processed",
 		errorDir:     "./error",
 		logDir:       "./log",
 		logLvl:       WARNING,
 	}
 
-	testDir := "./test"
-
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			err := createTestFolders(testDir)
-			defer func(testDir string) {
-				err = destroyTestFolders(testDir)
+			err := createTestFolders()
+			defer func() {
+				err = destroyTestFolders()
 				if err != nil {
 					t.Fatalf("Error cleaning up test folders: %v", err)
 				}
-			}(testDir)
+			}()
 			if err != nil {
 				t.Fatalf("Error creating test folders: %v", err)
 			}

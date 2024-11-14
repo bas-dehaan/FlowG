@@ -8,6 +8,7 @@ import (
 
 type configStruct struct {
 	glimsDir     string
+	importDir    string
 	processedDir string
 	errorDir     string
 	logDir       string
@@ -28,6 +29,14 @@ func SetConfig(key string, value interface{}) error {
 			return errors.New("glimsDir requires a string value")
 		}
 		config.glimsDir = v
+		isDir = true
+
+	case "importDir":
+		v, ok := value.(string)
+		if !ok {
+			return errors.New("importDir requires a string value")
+		}
+		config.importDir = v
 		isDir = true
 
 	case "processedDir":
@@ -73,7 +82,7 @@ func SetConfig(key string, value interface{}) error {
 		config.logLvl = v
 
 	default:
-		return fmt.Errorf("unknown config key (%s): use 'glimsDir', 'processedDir', 'errorDir', 'logDir', or 'logLvl'", key)
+		return fmt.Errorf("unknown config key (%s): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', or 'logLvl'", key)
 	}
 
 	// Check directory existence only for path keys
@@ -87,13 +96,15 @@ func SetConfig(key string, value interface{}) error {
 }
 
 // GetConfig retrieves the configuration value associated with the given key.
-// Available keys are: 'glimsDir', 'processedDir', 'errorDir', 'logDir', 'logLvl'.
+// Available keys are: 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', 'logLvl'.
 // Returns the configuration value and a nil error if the key is found,
 // otherwise returns nil and an error indicating that the key is unknown.
 func GetConfig(key string) (interface{}, error) {
 	switch key {
 	case "glimsDir":
 		return config.glimsDir, nil
+	case "importDir":
+		return config.importDir, nil
 	case "processedDir":
 		return config.processedDir, nil
 	case "errorDir":
@@ -103,6 +114,6 @@ func GetConfig(key string) (interface{}, error) {
 	case "logLvl":
 		return config.logLvl, nil
 	default:
-		return nil, fmt.Errorf("unknown config key (%s): use 'glimsDir', 'processedDir', 'errorDir', 'logDir', or 'logLvl'", key)
+		return nil, fmt.Errorf("unknown config key (%s): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', or 'logLvl'", key)
 	}
 }

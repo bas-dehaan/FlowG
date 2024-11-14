@@ -14,7 +14,7 @@ import (
 // the file path as an argument. If the callback returns true, the file is moved to the processed directory;
 // otherwise, it is moved to the error directory. Logging is performed for critical errors during the process.
 func FileWatch(callback func(string) bool) {
-	if _, err := os.Stat(config.glimsDir); os.IsNotExist(err) {
+	if _, err := os.Stat(config.importDir); os.IsNotExist(err) {
 		Logging(fmt.Sprintf("Cannot find importDir: %v", err), CRITICAL)
 		return
 	}
@@ -31,7 +31,7 @@ func FileWatch(callback func(string) bool) {
 		}
 	}(watcher)
 
-	err = watcher.Add(config.glimsDir)
+	err = watcher.Add(config.importDir)
 	if err != nil {
 		return
 	}

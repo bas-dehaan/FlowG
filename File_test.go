@@ -7,18 +7,15 @@ import (
 	"time"
 )
 
-func createTestFolders(testDir string) error {
-	var err error
-	// Test folder
-	if testDir != "" {
-		err = os.Mkdir(testDir, os.ModePerm)
-		if err != nil {
-			return err
-		}
+func createTestFolders() error {
+	// Glims folder
+	err := os.Mkdir(config.glimsDir, os.ModePerm)
+	if err != nil {
+		return err
 	}
 
-	// Glims folder
-	err = os.Mkdir(config.glimsDir, os.ModePerm)
+	// Import folder
+	err = os.Mkdir(config.importDir, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -40,17 +37,15 @@ func createTestFolders(testDir string) error {
 	return err
 }
 
-func destroyTestFolders(testDir string) error {
-	// Test folder
-	if testDir != "" {
-		err := os.RemoveAll(testDir)
-		if err != nil {
-			return err
-		}
-	}
-
+func destroyTestFolders() error {
 	// Glims folder
 	err := os.RemoveAll(config.glimsDir)
+	if err != nil {
+		return err
+	}
+
+	// Import folder
+	err = os.RemoveAll(config.importDir)
 	if err != nil {
 		return err
 	}
@@ -85,30 +80,29 @@ func TestFileMove(t *testing.T) {
 
 	config = &configStruct{
 		glimsDir:     "./glims",
+		importDir:    "./import",
 		processedDir: "./processed",
 		errorDir:     "./error",
 		logDir:       "./log",
 		logLvl:       WARNING,
 	}
 
-	testDir := "./test"
-
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			// create testfolders
-			err := createTestFolders(testDir)
-			defer func(testDir string) {
-				err = destroyTestFolders(testDir)
+			err := createTestFolders()
+			defer func() {
+				err = destroyTestFolders()
 				if err != nil {
 					t.Fatalf("Error cleaning up test folders: %v", err)
 				}
-			}(testDir)
+			}()
 			if err != nil {
 				t.Fatalf("Error creating test folders: %v", err)
 			}
 
 			// Create dummy file
-			originalPath := filepath.Join(testDir, "testFile.txt")
+			originalPath := filepath.Join(config.importDir, "testFile.txt")
 			if c.validPath {
 				file, err := os.Create(originalPath)
 				if err != nil {
@@ -213,6 +207,7 @@ func TestFileWatch(t *testing.T) {
 
 	config = &configStruct{
 		glimsDir:     "./glims",
+		importDir:    "./import",
 		processedDir: "./processed",
 		errorDir:     "./error",
 		logDir:       "./log",
@@ -225,7 +220,7 @@ func TestFileWatch(t *testing.T) {
 			var file *os.File
 
 			if c.validFolder {
-				err = createTestFolders("")
+				err = createTestFolders()
 				if err != nil {
 					t.Fatalf("Error creating test folders: %v", err)
 				}
@@ -253,7 +248,7 @@ func TestFileWatch(t *testing.T) {
 			time.Sleep(100 * time.Millisecond)
 
 			if c.createFile {
-				file, err = os.Create(filepath.Join(config.glimsDir, "testFile.txt"))
+				file, err = os.Create(filepath.Join(config.importDir, "testFile.txt"))
 				if err != nil {
 					t.Fatalf("Error creating test file: %v", err)
 				}
@@ -285,7 +280,7 @@ func TestFileWatch(t *testing.T) {
 				}
 			}
 			if c.validFolder {
-				err = destroyTestFolders(config.glimsDir)
+				err = destroyTestFolders()
 				if err != nil {
 					t.Fatalf("Error cleaning up test folders: %v", err)
 				}
