@@ -2,7 +2,6 @@ package FlowG
 
 import (
 	"os"
-	"strconv"
 	"strings"
 	"testing"
 )
@@ -147,10 +146,76 @@ func TestGlimsOutput(t *testing.T) {
 				fileBytes, _ := os.ReadFile(config.glimsDir + "/" + outputFiles[0].Name())
 				fileContent := string(fileBytes)
 
-				expectedContent := c.SampleList[0].SampleName + ";" + c.SampleList[0].Compound + ";;;" + strconv.FormatFloat(c.SampleList[0].ResultCalculatedAmount, 'f', 2, 64) + ";" + strconv.FormatFloat(c.SampleList[0].ResultInterceptAmount, 'f', 2, 64) + ";" + c.SampleList[0].InstrumentUsed + ";" + strconv.Itoa(c.SampleList[0].PeakIDForOutput) + ";" + strconv.FormatFloat(c.SampleList[0].DilutionFactor, 'f', 2, 64) + ";" + c.SampleList[0].OutputToGlims + "\n"
+				expectedContent := c.SampleList[0].SampleName + ";" + c.SampleList[0].Compound + ";;;" + convertToString(c.SampleList[0].ResultCalculatedAmount) + ";" + convertToString(c.SampleList[0].ResultInterceptAmount) + ";" + c.SampleList[0].InstrumentUsed + ";" + convertToString(c.SampleList[0].PeakIDForOutput) + ";" + convertToString(c.SampleList[0].DilutionFactor) + ";" + c.SampleList[0].OutputToGlims + "\n"
 				if !strings.Contains(fileContent, expectedContent) {
 					t.Errorf("Expected '%v' in output file, got '%v'", expectedContent, fileContent)
 				}
+			}
+		})
+	}
+}
+
+func TestConvertToString(t *testing.T) {
+	// `int` tests
+	intCases := []struct {
+		name     string
+		input    int
+		expected string
+	}{
+		{
+			name:     "integer zero",
+			input:    0,
+			expected: "",
+		},
+		{
+			name:     "positive integer",
+			input:    123,
+			expected: "123",
+		},
+		{
+			name:     "negative integer",
+			input:    -456,
+			expected: "-456",
+		},
+	}
+
+	for _, c := range intCases {
+		t.Run(c.name, func(t *testing.T) {
+			actual := convertToString(c.input)
+			if actual != c.expected {
+				t.Errorf("convertToString(%d): expected %s, got %s", c.input, c.expected, actual)
+			}
+		})
+	}
+
+	// `float64` tests
+	floatCases := []struct {
+		name     string
+		input    float64
+		expected string
+	}{
+		{
+			name:     "float zero",
+			input:    0.0,
+			expected: "",
+		},
+		{
+			name:     "positive float",
+			input:    78.90,
+			expected: "78.90",
+		},
+		{
+			name:     "negative float",
+			input:    -32.10,
+			expected: "-32.10",
+		},
+	}
+
+	for _, c := range floatCases {
+		t.Run(c.name, func(t *testing.T) {
+			actual := convertToString(c.input)
+			if actual != c.expected {
+				t.Errorf("convertToString(%f): expected %s, got %s", c.input, c.expected, actual)
 			}
 		})
 	}

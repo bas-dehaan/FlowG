@@ -66,12 +66,12 @@ func GlimsOutput(FileName string, SampleList []SampleStruct) bool {
 			sample.Compound,   // Column 02, Compound
 			"",                // Column 03, Empty column
 			"",                // Column 04, Empty column
-			strconv.FormatFloat(sample.ResultCalculatedAmount, 'f', 2, 64), // Column 05, Final concentration
-			strconv.FormatFloat(sample.ResultInterceptAmount, 'f', 2, 64),  // Column 06, Intercept concentration
-			sample.InstrumentUsed,                                  // Column 07, Instrument Used
-			strconv.Itoa(sample.PeakIDForOutput),                   // Column 08, Peak ID for Output
-			strconv.FormatFloat(sample.DilutionFactor, 'f', 2, 64), // Column 09, Dilution factor
-			sample.OutputToGlims,                                   // Column 10, Output to Glims
+			convertToString(sample.ResultCalculatedAmount), // Column 05, Final concentration
+			convertToString(sample.ResultInterceptAmount),  // Column 06, Intercept concentration
+			sample.InstrumentUsed,                          // Column 07, Instrument Used
+			convertToString(sample.PeakIDForOutput),        // Column 08, Peak ID for Output
+			convertToString(sample.DilutionFactor),         // Column 09, Dilution factor
+			sample.OutputToGlims,                           // Column 10, Output to Glims
 		}
 		if err = writer.Write(record); err != nil {
 			Logging(fmt.Sprintf("Cannot write to Glims-output file '%s': %v", FileName, err), ERROR)
@@ -101,4 +101,20 @@ func GlimsOutput(FileName string, SampleList []SampleStruct) bool {
 		return false
 	}
 	return true
+}
+
+// convertToString converts an integer or float64 value to a string. Returns an empty string if the value is zero.
+func convertToString[T int | float64](value T) string {
+	if value == 0 {
+		return ""
+	}
+	switch any(value).(type) {
+	case int:
+		return strconv.Itoa(any(value).(int))
+	case float64:
+		return strconv.FormatFloat(any(value).(float64), 'f', 2, 64)
+	default:
+		Logging(fmt.Sprintf("Cannot convert value to T. Got type '%T'", any(value)), ERROR)
+		return ""
+	}
 }
