@@ -31,14 +31,13 @@ func TestGlimsOutput(t *testing.T) {
 			expectOk: false,
 			SampleList: []SampleStruct{
 				{
-					SampleName:             "Sample1",
-					Compound:               "Compound1",
-					ResultCalculatedAmount: 0.123,
-					ResultInterceptAmount:  0.456,
-					InstrumentUsed:         "Instrument1",
-					PeakIDForOutput:        1,
-					DilutionFactor:         1.23,
-					OutputToGlims:          "Output1",
+					Barcode:           "Sample1",
+					TestName:          "Compound1",
+					IsolationSequence: "1",
+					Result:            0.123,
+					ResultINT:         0.456,
+					ResultCT:          0.789,
+					InstrumentID:      "Instrument1",
 				},
 			},
 		},
@@ -48,14 +47,13 @@ func TestGlimsOutput(t *testing.T) {
 			expectOk: true,
 			SampleList: []SampleStruct{
 				{
-					SampleName:             "Sample1",
-					Compound:               "Compound1",
-					ResultCalculatedAmount: 0.123,
-					ResultInterceptAmount:  0.456,
-					InstrumentUsed:         "Instrument1",
-					PeakIDForOutput:        1,
-					DilutionFactor:         1.23,
-					OutputToGlims:          "Output1",
+					Barcode:           "Sample1",
+					TestName:          "Compound1",
+					IsolationSequence: "1",
+					Result:            0.123,
+					ResultINT:         0.456,
+					ResultCT:          0.789,
+					InstrumentID:      "Instrument1",
 				},
 			},
 		},
@@ -65,14 +63,13 @@ func TestGlimsOutput(t *testing.T) {
 			expectOk: true,
 			SampleList: []SampleStruct{
 				{
-					SampleName:             "Sample1",
-					Compound:               "Compound1",
-					ResultCalculatedAmount: 0.123,
-					// Missing ResultInterceptAmount
-					InstrumentUsed: "Instrument1",
-					// Missing PeakIDForOutput
-					// Missing DilutionFactor
-					// Missing OutputToGlims
+					Barcode:  "Sample1",
+					TestName: "Compound1",
+					// Missing IsolationSequence
+					Result: 0.123,
+					// Missing ResultINT
+					// Missing ResultCT
+					InstrumentID: "Instrument1",
 				},
 			},
 		},
@@ -82,14 +79,13 @@ func TestGlimsOutput(t *testing.T) {
 			expectOk: false,
 			SampleList: []SampleStruct{
 				{
-					// Missing SampleName, making it invalid
-					Compound:               "Compound1",
-					ResultCalculatedAmount: 0.123,
-					ResultInterceptAmount:  0.456,
-					InstrumentUsed:         "Instrument1",
-					PeakIDForOutput:        1,
-					DilutionFactor:         1.23,
-					OutputToGlims:          "Output1",
+					// Missing Barcode, making it invalid
+					TestName:          "Compound1",
+					IsolationSequence: "1",
+					Result:            0.123,
+					ResultINT:         0.456,
+					ResultCT:          0.789,
+					InstrumentID:      "Instrument1",
 				},
 			},
 		},
@@ -146,7 +142,7 @@ func TestGlimsOutput(t *testing.T) {
 				fileBytes, _ := os.ReadFile(config.glimsDir + "/" + outputFiles[0].Name())
 				fileContent := string(fileBytes)
 
-				expectedContent := c.SampleList[0].SampleName + ";" + c.SampleList[0].Compound + ";;;" + convertToString(c.SampleList[0].ResultCalculatedAmount) + ";" + convertToString(c.SampleList[0].ResultInterceptAmount) + ";" + c.SampleList[0].InstrumentUsed + ";" + convertToString(c.SampleList[0].PeakIDForOutput) + ";" + convertToString(c.SampleList[0].DilutionFactor) + ";" + c.SampleList[0].OutputToGlims + "\n"
+				expectedContent := c.SampleList[0].Barcode + ";" + c.SampleList[0].TestName + ";" + c.SampleList[0].IsolationSequence + ";" + convertToString(c.SampleList[0].Result) + ";" + convertToString(c.SampleList[0].ResultINT) + ";" + convertToString(c.SampleList[0].ResultCT) + ";" + c.SampleList[0].InstrumentID + "\n"
 				if !strings.Contains(fileContent, expectedContent) {
 					t.Errorf("Expected '%v' in output file, got '%v'", expectedContent, fileContent)
 				}

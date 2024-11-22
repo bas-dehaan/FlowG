@@ -11,14 +11,13 @@ import (
 )
 
 type SampleStruct struct {
-	SampleName             string
-	Compound               string
-	ResultCalculatedAmount float64
-	ResultInterceptAmount  float64
-	InstrumentUsed         string
-	PeakIDForOutput        int
-	DilutionFactor         float64
-	OutputToGlims          string
+	Barcode           string
+	TestName          string
+	IsolationSequence string
+	Result            float64
+	ResultINT         float64
+	ResultCT          float64
+	InstrumentID      string
 }
 
 // GlimsOutput processes a list of samples and outputs them to a CSV file with the provided filename according to the FlowG standard.
@@ -56,22 +55,19 @@ func GlimsOutput(FileName string, SampleList []SampleStruct) bool {
 	successCounter := 0
 	for _, sample := range SampleList {
 		Logging(fmt.Sprintf("GlimsOutput - Processing sample: %v", sample), DEBUG)
-		if len(sample.SampleName) == 0 || len(sample.Compound) == 0 || len(sample.InstrumentUsed) == 0 {
+		if len(sample.Barcode) == 0 || len(sample.TestName) == 0 || len(sample.InstrumentID) == 0 {
 			Logging("Incomplete sample send to GlimsOutput, skipping", WARNING)
 			continue
 		}
 
 		record := []string{
-			sample.SampleName, // Column 01, Sample name
-			sample.Compound,   // Column 02, Compound
-			"",                // Column 03, Empty column
-			"",                // Column 04, Empty column
-			convertToString(sample.ResultCalculatedAmount), // Column 05, Final concentration
-			convertToString(sample.ResultInterceptAmount),  // Column 06, Intercept concentration
-			sample.InstrumentUsed,                          // Column 07, Instrument Used
-			convertToString(sample.PeakIDForOutput),        // Column 08, Peak ID for Output
-			convertToString(sample.DilutionFactor),         // Column 09, Dilution factor
-			sample.OutputToGlims,                           // Column 10, Output to Glims
+			sample.Barcode,                    // Column 01, SPECIMEN_ID
+			sample.TestName,                   // Column 02, TEST_ID
+			sample.IsolationSequence,          // Column 03, ISOLATION_SEQUENCE
+			convertToString(sample.Result),    // Column 04, RESULT
+			convertToString(sample.ResultINT), // Column 05, RSLTTYPE_INT
+			convertToString(sample.ResultCT),  // Column 06, RSLTTYPE_CT
+			sample.InstrumentID,               // Column 07, INSTRUMENT_ID
 		}
 		if err = writer.Write(record); err != nil {
 			Logging(fmt.Sprintf("Cannot write to Glims-output file '%s': %v", FileName, err), ERROR)
@@ -79,7 +75,7 @@ func GlimsOutput(FileName string, SampleList []SampleStruct) bool {
 		}
 
 		successCounter++
-		Logging(fmt.Sprintf("GlimsOutput - Sample '%s' was processed correcly", sample.SampleName), DEBUG)
+		Logging(fmt.Sprintf("GlimsOutput - Sample '%s' was processed correcly", sample.Barcode), DEBUG)
 	}
 
 	// Delete the outputfile if there were no samples successfully added to it
