@@ -55,7 +55,7 @@ func Logging(msg string, lvl uint8) {
 	}
 
 	// Set the log file name with today's date
-	logFileName := fmt.Sprintf("%s/log_%s.txt", config.logDir, time.Now().Format("2006-01-02"))
+	logFileName := fmt.Sprintf("%s/%s_%s.txt", config.logDir, config.logPrefix, time.Now().Format("2006-01-02"))
 	file, err := os.OpenFile(logFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		// Handle the error silently (or print to stderr if needed)

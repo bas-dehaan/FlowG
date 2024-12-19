@@ -34,9 +34,9 @@ func TestGlimsOutput(t *testing.T) {
 					Barcode:           "Sample1",
 					TestName:          "Compound1",
 					IsolationSequence: "1",
-					Result:            0.123,
-					ResultINT:         0.456,
-					ResultCT:          0.789,
+					Result:            ptrFloat64(0.123),
+					ResultINT:         ptrFloat64(0.456),
+					ResultCT:          ptrFloat64(0.789),
 					InstrumentID:      "Instrument1",
 				},
 			},
@@ -50,9 +50,9 @@ func TestGlimsOutput(t *testing.T) {
 					Barcode:           "Sample1",
 					TestName:          "Compound1",
 					IsolationSequence: "1",
-					Result:            0.123,
-					ResultINT:         0.456,
-					ResultCT:          0.789,
+					Result:            ptrFloat64(0.123),
+					ResultINT:         ptrFloat64(0.456),
+					ResultCT:          ptrFloat64(0.789),
 					InstrumentID:      "Instrument1",
 				},
 			},
@@ -66,7 +66,7 @@ func TestGlimsOutput(t *testing.T) {
 					Barcode:  "Sample1",
 					TestName: "Compound1",
 					// Missing IsolationSequence
-					Result: 0.123,
+					Result: ptrFloat64(0.123),
 					// Missing ResultINT
 					// Missing ResultCT
 					InstrumentID: "Instrument1",
@@ -82,9 +82,9 @@ func TestGlimsOutput(t *testing.T) {
 					// Missing Barcode, making it invalid
 					TestName:          "Compound1",
 					IsolationSequence: "1",
-					Result:            0.123,
-					ResultINT:         0.456,
-					ResultCT:          0.789,
+					Result:            ptrFloat64(0.123),
+					ResultINT:         ptrFloat64(0.456),
+					ResultCT:          ptrFloat64(0.789),
 					InstrumentID:      "Instrument1",
 				},
 			},
@@ -121,20 +121,19 @@ func TestGlimsOutput(t *testing.T) {
 
 			outputFiles, _ := os.ReadDir(config.glimsDir)
 			logFiles, _ := os.ReadDir(config.logDir)
-			if !c.expectOk {
-				if len(outputFiles) > 0 {
-					t.Errorf("Expected no output files, got %v", len(outputFiles))
-				}
-				if len(logFiles) != 1 {
-					t.Errorf("Expected 1 log file, got %v", len(outputFiles))
-				}
-			}
 			if c.expectOk {
 				if len(outputFiles) != 1 {
 					t.Errorf("Expected 1 output file, got %v", len(outputFiles))
 				}
 				if len(logFiles) > 0 {
 					t.Errorf("Expected no log files, got %v", len(outputFiles))
+				}
+			} else {
+				if len(outputFiles) > 0 {
+					t.Errorf("Expected no output files, got %v", len(outputFiles))
+				}
+				if len(logFiles) != 1 {
+					t.Errorf("Expected 1 log file, got %v", len(outputFiles))
 				}
 			}
 
@@ -155,23 +154,28 @@ func TestConvertToString(t *testing.T) {
 	// `int` tests
 	intCases := []struct {
 		name     string
-		input    int
+		input    *int
 		expected string
 	}{
 		{
-			name:     "integer zero",
-			input:    0,
-			expected: "",
-		},
-		{
 			name:     "positive integer",
-			input:    123,
+			input:    ptrInt(123),
 			expected: "123",
 		},
 		{
 			name:     "negative integer",
-			input:    -456,
+			input:    ptrInt(-456),
 			expected: "-456",
+		},
+		{
+			name:     "integer zero",
+			input:    ptrInt(0),
+			expected: "0",
+		},
+		{
+			name:     "nil integer",
+			input:    nil,
+			expected: "",
 		},
 	}
 
@@ -179,7 +183,7 @@ func TestConvertToString(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			actual := convertToString(c.input)
 			if actual != c.expected {
-				t.Errorf("convertToString(%d): expected %s, got %s", c.input, c.expected, actual)
+				t.Errorf("convertToString(%d): expected %s, got %s", *c.input, c.expected, actual)
 			}
 		})
 	}
@@ -187,23 +191,28 @@ func TestConvertToString(t *testing.T) {
 	// `float64` tests
 	floatCases := []struct {
 		name     string
-		input    float64
+		input    *float64
 		expected string
 	}{
 		{
-			name:     "float zero",
-			input:    0.0,
-			expected: "",
-		},
-		{
 			name:     "positive float",
-			input:    78.90,
+			input:    ptrFloat64(78.90),
 			expected: "78.90",
 		},
 		{
 			name:     "negative float",
-			input:    -32.10,
+			input:    ptrFloat64(-32.10),
 			expected: "-32.10",
+		},
+		{
+			name:     "float zero",
+			input:    ptrFloat64(0.00),
+			expected: "0.00",
+		},
+		{
+			name:     "nil float",
+			input:    nil,
+			expected: "",
 		},
 	}
 
@@ -211,8 +220,17 @@ func TestConvertToString(t *testing.T) {
 		t.Run(c.name, func(t *testing.T) {
 			actual := convertToString(c.input)
 			if actual != c.expected {
-				t.Errorf("convertToString(%f): expected %s, got %s", c.input, c.expected, actual)
+				t.Errorf("convertToString(%f): expected %s, got %s", *c.input, c.expected, actual)
 			}
 		})
 	}
+}
+
+// Helper functions for creating pointers
+func ptrInt(v int) *int {
+	return &v
+}
+
+func ptrFloat64(v float64) *float64 {
+	return &v
 }

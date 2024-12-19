@@ -20,8 +20,9 @@ func TestSetConfig(t *testing.T) {
 		{"Setting processedDir", "processedDir", "./processedDir", true, nil},
 		{"Setting errorDir", "errorDir", "./errorDir", true, nil},
 		{"Setting logDir", "logDir", "./logDir", true, nil},
+		{"Setting logPrefix", "logPrefix", "Prefix", false, nil},
 		{"Setting logLvl", "logLvl", INFO, false, nil},
-		{"Setting wrong key", "wrongKey", "value", false, errors.New(`unknown config key (wrongKey): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', or 'logLvl'`)},
+		{"Setting wrong key", "wrongKey", "value", false, errors.New(`unknown config key (wrongKey): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', 'logPrefix', or 'logLvl'`)},
 		{"Setting glimsDir to non-existing directory", "glimsDir", "/does/not/exist", false, errors.New("cannot find or access directory: /does/not/exist")},
 		{"Setting glimsDir to non-string value", "glimsDir", 123, false, errors.New("glimsDir requires a string value")},
 		{"Setting importDir to non-string value", "importDir", 123, false, errors.New("importDir requires a string value")},
@@ -67,8 +68,9 @@ func TestGetConfig(t *testing.T) {
 		{"Getting processedDir", "processedDir", "./processedDir", nil},
 		{"Getting errorDir", "errorDir", "./errorDir", nil},
 		{"Getting logDir", "logDir", "./logDir", nil},
+		{"Getting logPrefix", "logPrefix", "Prefix", nil},
 		{"Getting logLvl", "logLvl", INFO, nil},
-		{"Getting wrong key", "wrongKey", nil, errors.New(`unknown config key (wrongKey): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', or 'logLvl'`)},
+		{"Getting wrong key", "wrongKey", nil, errors.New(`unknown config key (wrongKey): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', logPrefix, or 'logLvl'`)},
 	}
 
 	config = &configStruct{
@@ -76,6 +78,7 @@ func TestGetConfig(t *testing.T) {
 		processedDir: "./processedDir",
 		errorDir:     "./errorDir",
 		logDir:       "./logDir",
+		logPrefix:    "Prefix",
 		logLvl:       INFO,
 	}
 

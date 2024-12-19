@@ -33,11 +33,13 @@ func TestLogging(t *testing.T) {
 	// updating config for tests
 	config.logDir = os.TempDir()
 	config.logLvl = WARNING
+	config.logPrefix = "Test"
 
 	defer func() {
-		// reread default values after tests for not breaking other functions if there are
+		// reset to default values after test, so not to break other tests
 		config.logDir = ""
 		config.logLvl = 1
+		config.logPrefix = ""
 	}()
 
 	cases := []struct {
@@ -62,7 +64,7 @@ func TestLogging(t *testing.T) {
 
 			Logging(c.msg, c.lvl)
 
-			logFileName := fmt.Sprintf("%s/log_%s.txt", config.logDir, time.Now().Format("2006-01-02"))
+			logFileName := fmt.Sprintf("%s/%s_%s.txt", config.logDir, config.logPrefix, time.Now().Format("2006-01-02"))
 
 			if _, err := os.Stat(logFileName); err == nil {
 				if !c.expLog {

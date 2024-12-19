@@ -12,6 +12,7 @@ type configStruct struct {
 	processedDir string
 	errorDir     string
 	logDir       string
+	logPrefix    string
 	logLvl       uint8
 }
 
@@ -63,6 +64,13 @@ func SetConfig(key string, value interface{}) error {
 		config.logDir = v
 		isDir = true
 
+	case "logPrefix":
+		v, ok := value.(string)
+		if !ok {
+			return errors.New("logPrefix requires a string value")
+		}
+		config.logPrefix = v
+
 	case "logLvl":
 		v, ok := value.(uint8)
 
@@ -82,7 +90,7 @@ func SetConfig(key string, value interface{}) error {
 		config.logLvl = v
 
 	default:
-		return fmt.Errorf("unknown config key (%s): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', or 'logLvl'", key)
+		return fmt.Errorf("unknown config key (%s): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', 'logPrefix', or 'logLvl'", key)
 	}
 
 	// Check directory existence only for path keys
@@ -111,9 +119,11 @@ func GetConfig(key string) (interface{}, error) {
 		return config.errorDir, nil
 	case "logDir":
 		return config.logDir, nil
+	case "logPrefix":
+		return config.logPrefix, nil
 	case "logLvl":
 		return config.logLvl, nil
 	default:
-		return nil, fmt.Errorf("unknown config key (%s): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', or 'logLvl'", key)
+		return nil, fmt.Errorf("unknown config key (%s): use 'glimsDir', 'importDir', 'processedDir', 'errorDir', 'logDir', logPrefix, or 'logLvl'", key)
 	}
 }

@@ -14,9 +14,9 @@ type SampleStruct struct {
 	Barcode           string
 	TestName          string
 	IsolationSequence string
-	Result            float64
-	ResultINT         float64
-	ResultCT          float64
+	Result            *float64
+	ResultINT         *float64
+	ResultCT          *float64
 	InstrumentID      string
 }
 
@@ -99,16 +99,19 @@ func GlimsOutput(FileName string, SampleList []SampleStruct) bool {
 	return true
 }
 
-// convertToString converts an integer or float64 value to a string. Returns an empty string if the value is zero.
-func convertToString[T int | float64](value T) string {
-	if value == 0 {
-		return ""
-	}
-	switch any(value).(type) {
-	case int:
-		return strconv.Itoa(any(value).(int))
-	case float64:
-		return strconv.FormatFloat(any(value).(float64), 'f', 2, 64)
+// convertToString converts an *integer or *float64 value to a string. Uses pointers to be capable of handling nil
+func convertToString[T *int | *float64](value T) string {
+	switch v := any(value).(type) {
+	case *int:
+		if v == nil {
+			return ""
+		}
+		return strconv.Itoa(*v)
+	case *float64:
+		if v == nil {
+			return ""
+		}
+		return strconv.FormatFloat(*v, 'f', 2, 64)
 	default:
 		Logging(fmt.Sprintf("Cannot convert value to T. Got type '%T'", any(value)), ERROR)
 		return ""

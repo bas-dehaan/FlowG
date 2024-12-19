@@ -84,6 +84,7 @@ func TestFileMove(t *testing.T) {
 		processedDir: "./processed",
 		errorDir:     "./error",
 		logDir:       "./log",
+		logPrefix:    "Test",
 		logLvl:       WARNING,
 	}
 
@@ -211,6 +212,7 @@ func TestFileWatch(t *testing.T) {
 		processedDir: "./processed",
 		errorDir:     "./error",
 		logDir:       "./log",
+		logPrefix:    "Test",
 		logLvl:       WARNING,
 	}
 
