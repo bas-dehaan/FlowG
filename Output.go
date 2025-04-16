@@ -32,7 +32,7 @@ func GlimsOutput(FileName string, SampleList []SampleStruct) bool {
 	}
 
 	timestamp := strings.ReplaceAll(time.Now().Format("20060102150405.000"), ".", "")
-	FileName = fmt.Sprintf("%s_%s.txt", timestamp, FileName)
+	FileName = fmt.Sprintf("input.%s_%s.txt", timestamp, FileName)
 
 	file, err := os.Create(filepath.Join(config.glimsDir, FileName))
 	if err != nil {
